@@ -38,8 +38,11 @@ git.files = function(opts)
 end
 
 git.commits = function(opts)
+  local path = opts.path or '.'
+  local revision_range = opts.revision_range or 'HEAD'
+
   local results = utils.get_os_command_output({
-    'git', 'log', '--pretty=oneline', '--abbrev-commit', '--', '.'
+    'git', 'log', '--pretty=oneline', '--abbrev-commit', revision_range, '--', path
   }, opts.cwd)
 
   pickers.new(opts, {

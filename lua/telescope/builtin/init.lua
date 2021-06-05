@@ -113,7 +113,11 @@ builtin.git_files = require('telescope.builtin.git').files
 --- Lists commits for current directory with diff preview
 --- - Default keymaps:
 ---   - `<cr>`: checks out the currently selected commit
+---   - `<c-f>`: runs `git fixup` for the staged changes using the selected commit
+---   - `<c-F>`: runs `git fixup` for the staged changes using the selected commit and applies the fixup
 ---@param opts table: options to pass to the picker
+---@field path string: only show commits matching the given path (default is '.')
+---@field revision_range string: only show commits in the specified revision range (default is 'HEAD' i.e. the whole history leading to the current commit)
 builtin.git_commits = require('telescope.builtin.git').commits
 
 --- Lists commits for current buffer with diff preview

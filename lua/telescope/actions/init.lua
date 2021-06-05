@@ -375,6 +375,47 @@ actions.git_checkout = function(prompt_bufnr)
   end
 end
 
+-- Create a fixup into the selected commit. Assumes there are staged changes
+-- ready to be commited.
+--@param prompt_bufnr number: The prompt bufnr
+--@param apply boolean: If true, the fixup will be rebased into the selected commit
+actions.git_fixup = function(prompt_bufnr, apply)
+  local cwd = action_state.get_current_picker(prompt_bufnr).cwd
+  local selection = action_state.get_selected_entry()
+
+  local _, ret, stderr = utils.get_os_command_output({'git', 'commit', '--fixup', selection.value}, cwd)
+  if ret == 0 then
+    if apply then
+      actions.git_apply_fixup(prompt_bufnr)
+    else
+      print('New fixup complete: <new_commit> commit_message')
+    end
+  else
+    print(string.format(
+      'Error when commiting the fixup into: %s. Git returned: "%s"',
+      selection.value,
+      table.concat(stderr, '  ')
+    ))
+  end
+end
+
+actions.git_apply_fixup = function(prompt_bufnr)
+  local cwd = action_state.get_current_picker(prompt_bufnr).cwd
+  local selection = action_state.get_selected_entry()
+
+  -- TODO(dmejorado): 2021-06-04 ﹣ figure out how to autosquash without interactive mode
+  local _, ret, stderr = utils.get_os_command_output({'git', 'rebase', '--autosquash', selection.value}, cwd)
+  if ret == 0 then
+    print('Fixed up into: <new_commit> commit_message')
+  else
+    print(string.format(
+      'Error when applying fixup into: %s. Git returned: "%s"',
+      selection.value,
+      table.concat(stderr, '  ')
+    ))
+  end
+end
+
 -- TODO: add this function header back once the treesitter max-query bug is resolved
 -- Switch to git branch
 -- If the branch already exists in local, switch to that.
